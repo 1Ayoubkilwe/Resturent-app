@@ -1,2 +1,3 @@
-const ip = "192.168.100.241";
+// Updated to your active Wi‑Fi IPv4 so the app can reach the backend
+const ip = "192.168.8.104";
 export default ip;

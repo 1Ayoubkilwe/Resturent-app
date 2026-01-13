@@ -22,13 +22,16 @@ const RegisterScreen = ({ navigation }) => {
         setIsLoading(true);
         try {
             console.log("Attempting registration to:", `${API_URL}`);
-            const res = await axios.post(`${API_URL}`, {
-                name,
-                email,
-                password
-            });
+            const res = await axios.post(
+                `${API_URL}`,
+                { name, email, password },
+                { timeout: 10000 }
+            );
             console.log("Registration success:", res.data);
-            await login(email, password);
+            const result = await login(email, password);
+            if (!result.success) {
+                Alert.alert("Auto-Login Failed", result.error || "Please try logging in manually.");
+            }
         } catch (e) {
             console.log(`Register error:`, e.response?.data || e.message);
             const errorMessage = e.response?.data?.message || "Registration failed. Please check your details and try again.";

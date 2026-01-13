@@ -12,6 +12,7 @@ const AddFoodScreen = ({ navigation, route }) => {
     const [price, setPrice] = useState(product?.price?.toString() || '');
     const [category, setCategory] = useState(product?.category?._id || product?.category || '');
     const [categories, setCategories] = useState([]);
+    const [showCategoryPicker, setShowCategoryPicker] = useState(false);
     const [image, setImage] = useState(product?.image ? { uri: `http://${ip}:5000/${product.image}` } : null);
     const [isLoading, setIsLoading] = useState(false);
     const { userToken } = useContext(AuthContext);
@@ -126,21 +127,32 @@ const AddFoodScreen = ({ navigation, route }) => {
                         onChangeText={setPrice}
                     />
                 </View>
-                <View className="mb-4">
-                    <Text className="text-gray-600 dark:text-gray-400 mb-3 font-medium">Category</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
-                        {categories.map((cat) => (
-                            <TouchableOpacity
-                                key={cat._id}
-                                onPress={() => setCategory(cat._id)}
-                                className={`mr-2 px-4 py-2 rounded-full border ${category === cat._id ? 'bg-orange-500 border-orange-500' : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700'}`}
-                            >
-                                <Text className={`font-bold ${category === cat._id ? 'text-white' : 'text-gray-600 dark:text-slate-400'}`}>
-                                    {cat.name}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </ScrollView>
+                <View className="w-[48%] mb-4">
+                    <Text className="text-gray-600 dark:text-gray-400 mb-2 font-medium">Category</Text>
+                    <TouchableOpacity
+                        onPress={() => setShowCategoryPicker(prev => !prev)}
+                        className="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 flex-row justify-between items-center"
+                    >
+                        <Text className="text-gray-800 dark:text-white">
+                            {category ? (categories.find(c => c._id === category)?.name || 'Select category') : 'Select category'}
+                        </Text>
+                        <Text className="text-orange-500 font-bold">{showCategoryPicker ? '▲' : '▼'}</Text>
+                    </TouchableOpacity>
+                    {showCategoryPicker && (
+                        <View className="mt-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl max-h-48">
+                            <ScrollView>
+                                {categories.map((cat, idx) => (
+                                    <TouchableOpacity
+                                        key={cat._id}
+                                        onPress={() => { setCategory(cat._id); setShowCategoryPicker(false); }}
+                                        className={`p-3 ${idx < categories.length - 1 ? 'border-b border-gray-200 dark:border-slate-800' : ''}`}
+                                    >
+                                        <Text className="text-gray-800 dark:text-white">{cat.name}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+                    )}
                 </View>
             </View>
 

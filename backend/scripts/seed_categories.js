@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv').config({ path: './.env' });
-const Category = require('./models/Category');
+const Category = require('../models/Category');
 
 const seedCategories = async () => {
     try {
@@ -12,10 +12,12 @@ const seedCategories = async () => {
             if (!exists) {
                 await Category.create({ name });
                 console.log(`Category created: ${name}`);
+            } else {
+                console.log(`Category exists: ${name}`);
             }
         }
         console.log('Seeding completed');
-        process.exit();
+        process.exit(0);
     } catch (e) {
         console.error(e);
         process.exit(1);

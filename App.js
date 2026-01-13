@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
+import { useTranslation } from 'react-i18next';
 
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -34,6 +35,14 @@ const AuthStack = () => {
 const MainTabs = () => {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useColorScheme();
+   const { t } = useTranslation();
+
+  const labels = {
+    Home: t('home'),
+    'Dine In': t('dine_in'),
+    Products: t('products'),
+    Profile: t('profile'),
+  };
 
   return (
     <Tab.Navigator
@@ -45,6 +54,7 @@ const MainTabs = () => {
           if (route.name === 'Products') return <Package size={size} color={color} />;
           if (route.name === 'Profile') return <User size={size} color={color} />;
         },
+        tabBarLabel: labels[route.name] || route.name,
         tabBarActiveTintColor: '#f97316',
         tabBarInactiveTintColor: colorScheme === 'dark' ? '#94a3b8' : '#64748b',
         tabBarStyle: {

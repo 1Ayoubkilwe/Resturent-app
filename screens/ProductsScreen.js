@@ -6,12 +6,14 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import ip from '../config/ip';
 import { useIsFocused } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 const ProductsScreen = ({ navigation }) => {
     const [products, setProducts] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const { userToken } = useContext(AuthContext);
+    const { t } = useTranslation();
     const isFocused = useIsFocused();
 
     useEffect(() => {
@@ -76,8 +78,8 @@ const ProductsScreen = ({ navigation }) => {
         <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
             <View className="px-6 py-4 flex-row justify-between items-center">
                 <View>
-                    <Text className="text-2xl font-bold text-slate-900 dark:text-white">Products</Text>
-                    <Text className="text-slate-500 dark:text-slate-400">Manage your menu items</Text>
+                    <Text className="text-2xl font-bold text-gray-900 dark:text-white">{t('products')}</Text>
+                    <Text className="text-gray-500 dark:text-gray-400">{t('food_management')}</Text>
                 </View>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('AddFood')}

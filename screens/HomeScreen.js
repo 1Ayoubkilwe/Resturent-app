@@ -40,7 +40,7 @@ const HomeScreen = ({ navigation }) => {
             <View className="px-6 flex-row justify-between items-center mb-6 mt-4">
                 <View>
                     <Text className="text-gray-500 dark:text-gray-400 font-medium">{t('home')}</Text>
-                    <Text className="text-2xl font-bold text-gray-800 dark:text-white">{userInfo?.name || "Restaurant"}</Text>
+                    <Text className="text-2xl font-bold text-gray-800 dark:text-white">{userInfo?.name || t('restaurant')}</Text>
                 </View>
                 <TouchableOpacity onPress={() => navigation.navigate('Profile')} className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-full items-center justify-center">
                     <Text className="text-xl">🏪</Text>
@@ -65,7 +65,7 @@ const HomeScreen = ({ navigation }) => {
                 ) : orders.length === 0 ? (
                     <View className="items-center justify-center py-20">
                         <ShoppingBag size={64} color="#e2e8f0" />
-                        <Text className="text-slate-400 mt-4">No active orders</Text>
+                        <Text className="text-slate-400 mt-4">{t('no_active_orders')}</Text>
                     </View>
                 ) : (
                     orders.map((order) => (
@@ -85,7 +85,7 @@ const HomeScreen = ({ navigation }) => {
                             <View className="flex-row justify-between items-center pt-3 border-t border-slate-200 dark:border-slate-800">
                                 <Text className="text-slate-800 dark:text-white font-bold">${order.totalPrice?.toFixed(2)}</Text>
                                 <TouchableOpacity className="flex-row items-center">
-                                    <Text className="text-orange-500 font-bold mr-1">Manage</Text>
+                                    <Text className="text-orange-500 font-bold mr-1">{t('manage')}</Text>
                                     <ChevronRight size={16} color="#f97316" />
                                 </TouchableOpacity>
                             </View>
@@ -94,7 +94,7 @@ const HomeScreen = ({ navigation }) => {
                 )}
 
                 <View className="mt-4 mb-4">
-                    <Text className="text-xl font-bold text-gray-800 dark:text-white mb-4">Quick Actions</Text>
+                    <Text className="text-xl font-bold text-gray-800 dark:text-white mb-4">{t('quick_actions')}</Text>
                     <View className="flex-row justify-between">
                         <TouchableOpacity
                             onPress={() => navigation.navigate('Products')}

@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import Constants from 'expo-constants';
 import { AuthContext } from '../context/AuthContext';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
@@ -13,25 +14,37 @@ const LoginScreen = ({ navigation }) => {
     const { login, googleLogin } = useContext(AuthContext);
 
     const GOOGLE_CONFIG = {
-        // In Expo Go, we must use the Web Client ID for Android to support the web-based auth flow
-        // The Android Client ID (native) only works in standalone builds (APK/AAB)
-        androidClientId: '195557748903-hphfkfj8a4q4bgradb286s0cuj5p6rm5.apps.googleusercontent.com', // Using Web ID for Expo Go
+        // expoClientId should use the Web OAuth client ID and have https://auth.expo.io/@<username>/<slug> whitelisted in Google console.
+        expoClientId: '195557748903-hphfkfj8a4q4bgradb286s0cuj5p6rm5.apps.googleusercontent.com',
         webClientId: '195557748903-hphfkfj8a4q4bgradb286s0cuj5p6rm5.apps.googleusercontent.com',
-        iosClientId: '',
+        // TODO: replace these with your platform-specific OAuth client IDs from Google Cloud once generated.
+        androidClientId:'195557748903-f7tld2rh7epjba4k3u5c4spmeiut5rhk.apps.googleusercontent.com',
+        iosClientId: 'YOUR_IOS_CLIENT_ID_HERE',
     };
 
+    const isExpoGo = Constants.appOwnership === 'expo';
+
+    // Use Expo proxy in Expo Go; fall back to app scheme in a build/dev client.
+    const redirectUri = AuthSession.makeRedirectUri({
+        scheme: 'restaurant-app',
+        path: 'redirect',
+        useProxy: isExpoGo,
+    });
+
     const [request, response, promptAsync] = Google.useAuthRequest({
-        clientId: GOOGLE_CONFIG.webClientId, // Force Web ID
+        expoClientId: GOOGLE_CONFIG.expoClientId,
         androidClientId: GOOGLE_CONFIG.androidClientId,
+        iosClientId: GOOGLE_CONFIG.iosClientId,
         webClientId: GOOGLE_CONFIG.webClientId,
-        // Force the Expo Auth Proxy Redirect URI
-        redirectUri: 'https://auth.expo.io/@ayoub_kilwe/client',
+        redirectUri: redirectUri,
+        scopes: ['profile', 'email'],
     });
 
     useEffect(() => {
         if (request) {
             console.log("Google Auth Request URL:", request.url);
-            console.log("Redirect URI being used:", request.redirectUri);
+            console.log("Redirect URI being used:", redirectUri);
+            console.log("Full request config:", JSON.stringify(request, null, 2));
         }
     }, [request]);
 
@@ -57,8 +70,8 @@ const LoginScreen = ({ navigation }) => {
             return;
         }
         promptAsync({
-            // Force account picker
             prompt: 'select_account',
+            useProxy: isExpoGo,
         });
     };
 

@@ -77,17 +77,15 @@ const AddCategoryScreen = ({ navigation }) => {
             <Text className="text-gray-600 dark:text-gray-400 mb-2 font-medium">Category Image</Text>
             <TouchableOpacity
                 onPress={pickImage}
-                className="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 mb-8 items-center justify-center overflow-hidden"
-                style={{ height: 150 }}
+                className="bg-orange-500 px-4 py-3 rounded-xl items-center justify-center mb-3"
             >
-                {image ? (
-                    <Image source={{ uri: image.uri }} className="w-full h-full" resizeMode="cover" />
-                ) : (
-                    <View className="items-center">
-                        <Text className="text-slate-400">Tap to select an image</Text>
-                    </View>
-                )}
+                <Text className="text-white font-semibold">Add Photo</Text>
             </TouchableOpacity>
+            {image && (
+                <View className="mb-8">
+                    <Image source={{ uri: image.uri }} className="w-full h-40 rounded-xl" resizeMode="cover" />
+                </View>
+            )}
 
             <TouchableOpacity
                 className="bg-orange-500 p-4 rounded-2xl items-center shadow-sm"

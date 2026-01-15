@@ -4,36 +4,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { Package, Utensils, Clock, ShoppingBag, ChevronRight } from 'lucide-react-native';
-import axios from 'axios';
-import ip from '../config/ip';
 import { useIsFocused } from '@react-navigation/native';
 
 const HomeScreen = ({ navigation }) => {
     const { t } = useTranslation();
     const { userInfo, userToken } = useContext(AuthContext);
     const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const isFocused = useIsFocused();
 
     useEffect(() => {
         if (isFocused) {
-            fetchOrders();
-        }
-    }, [isFocused]);
-
-    const fetchOrders = async () => {
-        try {
-            setLoading(true);
-            const response = await axios.get(`http://${ip}:5000/api/orders`, {
-                headers: { Authorization: `Bearer ${userToken}` }
-            });
-            setOrders(response.data);
-        } catch (e) {
-            console.log("Fetch orders error:", e);
-        } finally {
+            // Orders feature is paused; keep placeholder
+            setOrders([]);
             setLoading(false);
         }
-    };
+    }, [isFocused]);
 
     return (
         <SafeAreaView className="flex-1 bg-white dark:bg-slate-950">
@@ -52,7 +38,7 @@ const HomeScreen = ({ navigation }) => {
                 className="px-6"
                 contentContainerStyle={{ paddingBottom: 150 }}
                 refreshControl={
-                    <RefreshControl refreshing={loading} onRefresh={fetchOrders} />
+                    <RefreshControl refreshing={loading} onRefresh={() => {}} />
                 }
             >
 
@@ -66,6 +52,7 @@ const HomeScreen = ({ navigation }) => {
                     <View className="items-center justify-center py-20">
                         <ShoppingBag size={64} color="#e2e8f0" />
                         <Text className="text-slate-400 mt-4">{t('no_active_orders')}</Text>
+                        <Text className="text-slate-400 text-sm mt-1">Coming soon — this feature is being rebuilt.</Text>
                     </View>
                 ) : (
                     orders.map((order) => (

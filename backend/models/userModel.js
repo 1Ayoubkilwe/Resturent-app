@@ -22,6 +22,14 @@ const userSchema = mongoose.Schema({
         type: String,
         default: ""
     },
+    restaurantImages: {
+        type: [String],
+        default: []
+    },
+    coordinates: {
+        lat: { type: Number, default: null },
+        lng: { type: Number, default: null }
+    },
     isRestaurantOpen: {
         type: Boolean,
         default: true

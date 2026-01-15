@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ip from '../config/ip';
 import i18n from '../i18n';
+import { Platform } from 'react-native';
 
 export const AuthContext = createContext();
 
@@ -77,15 +78,57 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(false);
     }
 
-    const updateProfile = async (name, phone, location, isRestaurantOpen, language) => {
+    const updateProfile = async ({ name, phone, location, isRestaurantOpen, language, coordinates, photos }) => {
         setIsLoading(true);
         try {
+            const formData = new FormData();
+
+            const baseUrl = `http://${ip}:5000`;
+            const existingImages = (photos || [])
+                .filter((photo) => !photo.isLocal)
+                .map((photo) => photo.path || photo.uri.replace(baseUrl, ''));
+
+            if (name !== undefined) formData.append('name', name);
+            if (phone !== undefined) formData.append('phone', phone);
+            if (location !== undefined) formData.append('location', location);
+            if (isRestaurantOpen !== undefined) formData.append('isRestaurantOpen', isRestaurantOpen);
+            if (language !== undefined) formData.append('language', language);
+            if (coordinates?.latitude && coordinates?.longitude) {
+                formData.append('latitude', coordinates.latitude);
+                formData.append('longitude', coordinates.longitude);
+            }
+
+            formData.append('existingImages', JSON.stringify(existingImages));
+
+            const localPhotos = (photos || []).filter((photo) => photo.isLocal);
+
+            if (Platform.OS === 'web') {
+                for (let index = 0; index < localPhotos.length; index++) {
+                    const photo = localPhotos[index];
+                    const response = await fetch(photo.uri);
+                    const blob = await response.blob();
+                    const fileName = photo.name || `photo-${index}.jpg`;
+                    const fileType = photo.type || blob.type || 'image/jpeg';
+                    const file = new File([blob], fileName, { type: fileType });
+                    formData.append('images', file, fileName);
+                }
+            } else {
+                localPhotos.forEach((photo, index) => {
+                    formData.append('images', {
+                        uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
+                        name: photo.name || `photo-${index}.jpg`,
+                        type: photo.type || 'image/jpeg',
+                    });
+                });
+            }
+
             const response = await axios.put(
                 `http://${ip}:5000/api/users/profile`,
-                { name, phone, location, isRestaurantOpen, language },
+                formData,
                 {
                     headers: {
                         Authorization: `Bearer ${userToken}`,
+                        'Content-Type': 'multipart/form-data',
                     },
                 }
             );
@@ -96,7 +139,8 @@ export const AuthProvider = ({ children }) => {
         } catch (e) {
             console.log(e);
             setIsLoading(false);
-            return { success: false, error: e.response?.data?.message || 'Something went wrong' };
+            const message = e.response?.data?.message || e.message || 'Something went wrong';
+            return { success: false, error: message };
         }
     };
 

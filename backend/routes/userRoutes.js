@@ -8,11 +8,12 @@ const {
     googleLogin
 } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 
 router.post('/', registerUser);
 router.post('/login', loginUser);
 router.post('/google', googleLogin);
 router.get('/me', protect, getMe);
-router.put('/profile', protect, updateProfile);
+router.put('/profile', protect, upload.array('images', 5), updateProfile);
 
 module.exports = router;

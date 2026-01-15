@@ -42,8 +42,11 @@ const registerUser = asyncHandler(async (req, res) => {
             email: user.email,
             phone: user.phone,
             location: user.location,
+            restaurantImages: user.restaurantImages,
+            coordinates: user.coordinates,
             isRestaurantOpen: user.isRestaurantOpen,
             workingHours: user.workingHours,
+            language: user.language,
             token: generateToken(user._id),
         });
     } else {
@@ -75,8 +78,11 @@ const loginUser = asyncHandler(async (req, res) => {
             email: user.email,
             phone: user.phone,
             location: user.location,
+            restaurantImages: user.restaurantImages,
+            coordinates: user.coordinates,
             isRestaurantOpen: user.isRestaurantOpen,
             workingHours: user.workingHours,
+            language: user.language,
             token: generateToken(user._id),
         });
     } else {
@@ -97,16 +103,19 @@ const googleLogin = asyncHandler(async (req, res) => {
 
     if (user) {
         // User exists, login
-        res.json({
-            _id: user.id,
-            name: user.name,
-            email: user.email,
-            phone: user.phone,
-            location: user.location,
-            isRestaurantOpen: user.isRestaurantOpen,
-            workingHours: user.workingHours,
-            token: generateToken(user._id),
-        });
+            res.json({
+                _id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                location: user.location,
+                restaurantImages: user.restaurantImages,
+                coordinates: user.coordinates,
+                isRestaurantOpen: user.isRestaurantOpen,
+                workingHours: user.workingHours,
+                language: user.language,
+                token: generateToken(user._id),
+            });
     } else {
         // User doesn't exist, create new user
         // Generate random password
@@ -127,6 +136,8 @@ const googleLogin = asyncHandler(async (req, res) => {
                 email: newUser.email,
                 phone: newUser.phone,
                 location: newUser.location,
+                restaurantImages: newUser.restaurantImages,
+                coordinates: newUser.coordinates,
                 isRestaurantOpen: newUser.isRestaurantOpen,
                 workingHours: newUser.workingHours,
                 language: newUser.language,
@@ -160,25 +171,39 @@ const updateProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
-        user.name = req.body.name || user.name;
+        const parsedIsOpen = req.body.isRestaurantOpen !== undefined
+            ? (req.body.isRestaurantOpen === true || req.body.isRestaurantOpen === 'true')
+            : undefined;
+
+        user.name = req.body.name?.trim() || user.name;
         user.phone = req.body.phone || user.phone;
         user.location = req.body.location || user.location;
 
-        if (req.body.isRestaurantOpen !== undefined) {
-            user.isRestaurantOpen = req.body.isRestaurantOpen;
+        if (parsedIsOpen !== undefined) {
+            user.isRestaurantOpen = parsedIsOpen;
         }
 
         if (req.body.workingHours) {
             user.workingHours = req.body.workingHours;
         }
 
-        if (req.body.password) {
-            user.password = bcrypt.hashSync(req.body.password, 10);
-        }
-
         if (req.body.language) {
             user.language = req.body.language;
         }
+
+        if (req.body.latitude && req.body.longitude) {
+            user.coordinates = {
+                lat: Number(req.body.latitude),
+                lng: Number(req.body.longitude),
+            };
+        }
+
+        const existingImages = req.body.existingImages
+            ? JSON.parse(req.body.existingImages)
+            : user.restaurantImages || [];
+
+        const uploadedImages = (req.files || []).map((file) => `/uploads/${file.filename}`);
+        user.restaurantImages = [...existingImages, ...uploadedImages];
 
         const updatedUser = await user.save();
 
@@ -188,6 +213,8 @@ const updateProfile = asyncHandler(async (req, res) => {
             email: updatedUser.email,
             phone: updatedUser.phone,
             location: updatedUser.location,
+            restaurantImages: updatedUser.restaurantImages,
+            coordinates: updatedUser.coordinates,
             isRestaurantOpen: updatedUser.isRestaurantOpen,
             workingHours: updatedUser.workingHours,
             language: updatedUser.language,

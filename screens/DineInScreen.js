@@ -269,18 +269,15 @@ const DineInScreen = () => {
                         <Text className="text-slate-600 dark:text-slate-400 mb-2">{t('table_image')}</Text>
                         <TouchableOpacity
                             onPress={pickImage}
-                            className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-6 items-center justify-center overflow-hidden"
-                            style={{ height: 120 }}
+                            className="bg-orange-500 px-4 py-3 rounded-xl items-center justify-center"
                         >
-                            {image ? (
-                                <Image source={{ uri: image.uri }} className="w-full h-full" resizeMode="cover" />
-                            ) : (
-                                <View className="items-center">
-                                    <Camera size={24} color="#94a3b8" />
-                                    <Text className="text-slate-400 mt-1">{t('add_photo')}</Text>
-                                </View>
-                            )}
+                            <Text className="text-white font-semibold">{t('add_photo')}</Text>
                         </TouchableOpacity>
+                        {image && (
+                            <View className="mt-3 mb-6">
+                                <Image source={{ uri: image.uri }} className="w-full h-32 rounded-xl" resizeMode="cover" />
+                            </View>
+                        )}
 
                         <View className="flex-row justify-between mt-4">
                             <TouchableOpacity

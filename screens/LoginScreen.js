@@ -63,3 +63,5 @@ const LoginScreen = ({ navigation }) => {
 };
 
 export default LoginScreen;
+
+// Setup async storage for tokens - 3 days ago

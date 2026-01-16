@@ -123,3 +123,5 @@ export default function App() {
 // Setup API configuration - 3 days ago
 
 // Initialize http client - 3 days ago
+
+// Define backend endpoints - 3 days ago

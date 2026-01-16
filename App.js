@@ -125,3 +125,5 @@ export default function App() {
 // Initialize http client - 3 days ago
 
 // Define backend endpoints - 3 days ago
+
+// Add networking permissions - 3 days ago

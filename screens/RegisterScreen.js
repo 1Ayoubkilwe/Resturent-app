@@ -95,3 +95,5 @@ const RegisterScreen = ({ navigation }) => {
 };
 
 export default RegisterScreen;
+
+// Connect registration to backend - 2 days ago

@@ -7,6 +7,7 @@ import { ShoppingBag, ChevronRight, BarChart3, Clock, Banknote } from 'lucide-re
 import { useIsFocused } from '@react-navigation/native';
 import axios from 'axios';
 import ip from '../config/ip';
+import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 
 const HomeScreen = ({ navigation }) => {
     const { t } = useTranslation();
@@ -14,7 +15,16 @@ const HomeScreen = ({ navigation }) => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [analyticsLoading, setAnalyticsLoading] = useState(false);
-    const [analytics, setAnalytics] = useState({ visitors: 0, reservations: 0, orders: 0, revenue: 0 });
+    const [analytics, setAnalytics] = useState({
+        visitors: 0,
+        reservations: 0,
+        orders: 0,
+        revenue: 0,
+        visitorsSeries: [],
+        revenueSeries: [],
+        visitorsSample: false,
+        revenueSample: false,
+    });
     const isFocused = useIsFocused();
 
     useEffect(() => {
@@ -30,7 +40,22 @@ const HomeScreen = ({ navigation }) => {
         try {
             setAnalyticsLoading(true);
             const res = await axios.get(`http://${ip}:5000/api/analytics/summary`);
-            setAnalytics({ visitors: res.data.visitors || 0, reservations: res.data.reservations || 0, orders: res.data.orders || 0, revenue: res.data.revenue || 0 });
+            const visitorsSeries = res.data.visitorsSeries || [];
+            const revenueSeries = res.data.revenueSeries || [];
+
+            const visitorsSample = visitorsSeries.length === 0;
+            const revenueSample = revenueSeries.length === 0;
+
+            setAnalytics({
+                visitors: res.data.visitors || 0,
+                reservations: res.data.reservations || 0,
+                orders: res.data.orders || 0,
+                revenue: res.data.revenue || 0,
+                visitorsSeries: visitorsSample ? buildSampleSeries(80, 12) : visitorsSeries,
+                revenueSeries: revenueSample ? buildSampleSeries(1200, 180) : revenueSeries,
+                visitorsSample,
+                revenueSample,
+            });
         } catch (err) {
             console.log('Analytics fetch error', err?.response?.data || err.message);
         } finally {
@@ -116,6 +141,14 @@ const HomeScreen = ({ navigation }) => {
                         </View>
                     )}
                 </View>
+
+                {!analyticsLoading && (
+                    <View className="mb-10">
+                        <Text className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Trends (last 7 days)</Text>
+                        <TrendCard title="Visitors" data={analytics.visitorsSeries} color="#f97316" isSample={analytics.visitorsSample} />
+                        <TrendCard title="Revenue" data={analytics.revenueSeries} color="#0ea5e9" isSample={analytics.revenueSample} formatter={(v) => `$${Number(v || 0).toFixed(2)}`} />
+                    </View>
+                )}
             </ScrollView>
         </SafeAreaView>
     );
@@ -131,3 +164,77 @@ const AnalyticsCard = ({ label, value, icon }) => (
 );
 
 export default HomeScreen;
+
+const TrendCard = ({ title, data, color, formatter, isSample }) => {
+    const values = Array.isArray(data) ? data : [];
+    const latest = values[values.length - 1]?.value ?? 0;
+    return (
+        <View className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl mb-3 border border-slate-100 dark:border-slate-800 shadow-sm">
+            <View className="flex-row justify-between items-center mb-2">
+                <Text className="text-slate-600 dark:text-slate-300 font-medium">{title}</Text>
+                <Text className="text-lg font-bold text-slate-900 dark:text-white">{formatter ? formatter(latest) : latest}</Text>
+            </View>
+            {values.length > 0 ? (
+                <>
+                    <Sparkline data={values} color={color} />
+                    {isSample ? <Text className="text-[11px] text-slate-400 mt-1">Sample data (no GA4 data yet)</Text> : null}
+                </>
+            ) : (
+                <Text className="text-slate-400 text-xs">No data yet</Text>
+            )}
+        </View>
+    );
+};
+
+const Sparkline = ({ data, color = '#f97316', width = 220, height = 90 }) => {
+    const values = data.map((d) => Number(d.value || 0));
+    const max = Math.max(...values, 1);
+    const min = Math.min(...values, 0);
+    const range = max - min || 1;
+    const stepX = data.length > 1 ? width / (data.length - 1) : width;
+
+    const points = data.map((d, i) => {
+        const x = i * stepX;
+        const y = height - ((Number(d.value || 0) - min) / range) * (height - 10);
+        return { x, y };
+    });
+
+    const linePath = points.reduce((acc, p, idx) => acc + `${idx === 0 ? 'M' : 'L'}${p.x.toFixed(2)},${p.y.toFixed(2)} `, '');
+    const areaPath = `${linePath} L${width},${height} L0,${height} Z`;
+    const gradId = `grad-${color.replace('#', '')}`;
+
+    return (
+        <View className="bg-white/60 dark:bg-slate-800/60 rounded-xl p-3">
+            <Svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`}>
+                <Defs>
+                    <LinearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+                        <Stop offset="0" stopColor={color} stopOpacity="0.35" />
+                        <Stop offset="1" stopColor={color} stopOpacity="0" />
+                    </LinearGradient>
+                </Defs>
+                <Path d={areaPath} fill={`url(#${gradId})`} />
+                <Path d={linePath} stroke={color} strokeWidth="2.5" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+            </Svg>
+            <View className="flex-row justify-between mt-2">
+                <Text className="text-[11px] text-slate-400">7d ago</Text>
+                <Text className="text-[11px] text-slate-400">Today</Text>
+            </View>
+        </View>
+    );
+};
+
+const buildSampleSeries = (base = 50, swing = 10) => {
+    const today = new Date();
+    const series = [];
+    for (let i = 6; i >= 0; i -= 1) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const bump = Math.sin((i / 6) * Math.PI) * swing;
+        const jitter = (Math.random() - 0.5) * swing * 0.4;
+        const value = Math.max(0, Math.round(base + bump + jitter));
+        series.push({ date: d.toISOString().slice(0, 10).replace(/-/g, ''), value });
+    }
+    return series;
+};
+
+// Implement order fetching - 2 days ago

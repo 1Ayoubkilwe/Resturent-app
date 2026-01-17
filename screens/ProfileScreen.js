@@ -435,3 +435,5 @@ const ProfileScreen = ({ navigation }) => {
 };
 
 export default ProfileScreen;
+
+// Fetch user profile data - 2 days ago

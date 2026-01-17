@@ -127,3 +127,5 @@ export default function App() {
 // Define backend endpoints - 3 days ago
 
 // Add networking permissions - 3 days ago
+
+// Handle API errors - 2 days ago

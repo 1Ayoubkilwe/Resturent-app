@@ -133,3 +133,5 @@ export default function App() {
 // Fix timeout issues - 2 days ago
 
 // Hotfix: Fix API url typo - 33 hours ago
+
+// Fix padding on mobile - 1 day ago

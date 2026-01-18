@@ -240,3 +240,5 @@ const buildSampleSeries = (base = 50, swing = 10) => {
 // Implement order fetching - 2 days ago
 
 // Improve home screen layout - 1 day ago
+
+// Add animations to cards - 1 day ago

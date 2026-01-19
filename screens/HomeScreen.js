@@ -92,7 +92,7 @@ const HomeScreen = ({ navigation }) => {
                     </View>
                 ) : orders.length === 0 ? (
                     <View className="items-center justify-center py-20">
-                        <ShoppingBag size={64} color="#e2e8f0" />
+                        <ShoppingBag size={64} color="orange" />
                         <Text className="text-slate-400 mt-4">{t('no_active_orders')}</Text>
                         <Text className="text-slate-400 text-sm mt-1">Coming soon — this feature is being rebuilt.</Text>
                     </View>

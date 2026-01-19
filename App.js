@@ -14,7 +14,6 @@ import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import AddFoodScreen from './screens/AddFoodScreen';
-import AddCategoryScreen from './screens/AddCategoryScreen';
 import DineInScreen from './screens/DineInScreen';
 import ProductsScreen from './screens/ProductsScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -35,7 +34,7 @@ const AuthStack = () => {
 const MainTabs = () => {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useColorScheme();
-   const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const labels = {
     Home: t('home'),
@@ -87,7 +86,6 @@ const AppStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="AddFood" component={AddFoodScreen} options={{ title: 'Add Food' }} />
-      <Stack.Screen name="AddCategory" component={AddCategoryScreen} options={{ title: 'Add Category' }} />
     </Stack.Navigator>
   );
 };

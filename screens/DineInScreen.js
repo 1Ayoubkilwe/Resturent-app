@@ -152,7 +152,7 @@ const DineInScreen = () => {
                     <Switch
                         value={isEnabled}
                         onValueChange={toggleSwitch}
-                        trackColor={{ false: '#cbd5e1', true: '#f97316' }}
+                        trackColor={{ false: '#93979cff', true: '#f97316' }}
                     />
                 </View>
 

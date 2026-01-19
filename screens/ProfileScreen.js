@@ -226,7 +226,7 @@ const ProfileScreen = ({ navigation }) => {
                             <Switch
                                 value={isOpen}
                                 onValueChange={toggleOpenStatus}
-                                trackColor={{ false: '#ef4444', true: '#22c55e' }}
+                                trackColor={{ false: 'gray', true: '#22c55e' }}
                                 thumbColor={'#ffffff'}
                             />
                         </View>
@@ -242,19 +242,19 @@ const ProfileScreen = ({ navigation }) => {
                                 onPress={() => changeLanguage('en')}
                                 className={`flex-1 p-3 rounded-xl items-center ${i18n.language === 'en' ? 'bg-orange-500' : ''}`}
                             >
-                                <Text className={`font-bold ${i18n.language === 'en' ? 'text-white' : 'text-slate-600 dark:text-slate-400'}`}>EN</Text>
+                                <Text className={`font-bold ${i18n.language === 'en' ? 'text-white' : 'text-slate-600 dark:text-slate-400'}`}>ENGLISH</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => changeLanguage('so')}
                                 className={`flex-1 p-3 rounded-xl items-center ${i18n.language === 'so' ? 'bg-orange-500' : ''}`}
                             >
-                                <Text className={`font-bold ${i18n.language === 'so' ? 'text-white' : 'text-slate-600 dark:text-slate-400'}`}>SO</Text>
+                                <Text className={`font-bold ${i18n.language === 'so' ? 'text-white' : 'text-slate-600 dark:text-slate-400'}`}>SOMALI</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => changeLanguage('ar')}
                                 className={`flex-1 p-3 rounded-xl items-center ${i18n.language === 'ar' ? 'bg-orange-500' : ''}`}
                             >
-                                <Text className={`font-bold ${i18n.language === 'ar' ? 'text-white' : 'text-slate-600 dark:text-slate-400'}`}>AR</Text>
+                                <Text className={`font-bold ${i18n.language === 'ar' ? 'text-white' : 'text-slate-600 dark:text-slate-400'}`}>ARABIC</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -272,7 +272,7 @@ const ProfileScreen = ({ navigation }) => {
                             <Switch
                                 value={colorScheme === 'dark'}
                                 onValueChange={toggleColorScheme}
-                                trackColor={{ false: '#cbd5e1', true: '#f97316' }}
+                                trackColor={{ false: 'gray', true: '#f97316' }}
                                 thumbColor={'#ffffff'}
                             />
                         </View>

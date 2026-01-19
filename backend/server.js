@@ -17,10 +17,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/external', require('./routes/externalRoutes'));
 app.use('/api/food', require('./routes/foodRoutes'));
 app.use('/api/dine-in', require('./routes/dineInRoutes'));
-app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 
 app.get('/', (req, res) => {

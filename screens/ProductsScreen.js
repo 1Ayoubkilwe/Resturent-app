@@ -1,3 +1,4 @@
+// Libraries
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, Alert, ActivityIndicator, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,20 +9,24 @@ import ip from '../config/ip';
 import { useIsFocused } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 
+// ProductsScreen - Screen-ka aan ku maamulno cuntada (food items)
 const ProductsScreen = ({ navigation }) => {
+    // State - Liiska products-ka, search query, iyo loading
     const [products, setProducts] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const { userToken } = useContext(AuthContext);
-    const { t } = useTranslation();
-    const isFocused = useIsFocused();
+    const { t } = useTranslation(); // Luqadaha (Somali/English)
+    const isFocused = useIsFocused(); // Hubi in screen-ku visible yahay
 
+    // Markii screen-ku visible noqdo, products-ka soo qaad
     useEffect(() => {
         if (isFocused) {
             fetchProducts();
         }
     }, [isFocused]);
 
+    // fetchProducts - Backend-ka products-ka ka soo qaad
     const fetchProducts = async () => {
         try {
             setLoading(true);
@@ -37,10 +42,12 @@ const ProductsScreen = ({ navigation }) => {
         }
     };
 
+    // filteredProducts - Products-ka filter garee marka la raadiyo (search)
     const filteredProducts = products.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    // deleteProduct - Product tir (Delete)
     const deleteProduct = (id) => {
         Alert.alert(
             'Delete Product',
@@ -116,7 +123,6 @@ const ProductsScreen = ({ navigation }) => {
                         />
                         <View className="flex-1 ml-4">
                             <Text className="text-lg font-bold text-slate-900 dark:text-white" numberOfLines={1}>{item.name}</Text>
-                            <Text className="text-slate-500 dark:text-slate-400 text-sm" numberOfLines={1}>{item.category?.name || 'Uncategorized'}</Text>
                             <Text className="text-orange-500 font-bold mt-1">${item.price}</Text>
                         </View>
                         <View className="flex-row">

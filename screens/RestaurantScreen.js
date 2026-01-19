@@ -198,7 +198,7 @@ const RestaurantScreen = () => {
             {isLoading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text className="text-white font-semibold">{t('save')}</Text>
+              <Text className="text-white  font-semibold">{t('save')}</Text>
             )}
           </TouchableOpacity>
         </View>

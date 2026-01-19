@@ -1,20 +1,36 @@
+// Libraries
 import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+
+// AuthContext - Waxaan ka soo qaadaneynaa login function-ka
 import { AuthContext } from '../context/AuthContext';
+
+// IP address-ka backend-ka
 import ip from '../config/ip';
 
+// LoginScreen - Screen-ka user-ku ku login gareyo
 const LoginScreen = ({ navigation }) => {
+    // State - Email iyo password oo user-ku qoray
     const [email, setEmail] = useState(null);
     const [password, setPassword] = useState(null);
+
+    // AuthContext-ka login function-ka ka soo qaad
     const { login } = useContext(AuthContext);
 
+    // handleLogin - Markii user-ku riixo "Login" button-ka
     const handleLogin = async () => {
+        // Hubi in email iyo password la buuxiyay
         if (!email || !password) {
             Alert.alert("Error", "Please fill in all fields");
             return;
         }
+
         console.log("Attempting login to:", `http://${ip}:5000/api/users/login`);
+
+        // Login function-ka AuthContext-ka ka yeedh
         const result = await login(email, password);
+
+        // Haddii login-ku fashilmo, fariin khalad muuji
         if (!result.success) {
             Alert.alert("Login Failed", result.error);
         }
@@ -63,11 +79,3 @@ const LoginScreen = ({ navigation }) => {
 };
 
 export default LoginScreen;
-
-// Setup async storage for tokens - 3 days ago
-
-// Integrate login API - 2 days ago
-
-// Refactor API calls - 2 days ago
-
-// Style login button - 1 day ago

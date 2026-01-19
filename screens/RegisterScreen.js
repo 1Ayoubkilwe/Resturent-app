@@ -1,10 +1,13 @@
+// Libraries
 import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import ip from '../config/ip';
 
+// RegisterScreen - Screen-ka user-ku ku diiwaan gashado (create account)
 const RegisterScreen = ({ navigation }) => {
+    // State - Xogta user-ku qoray (name, email, password)
     const [name, setName] = useState(null);
     const [email, setEmail] = useState(null);
     const [password, setPassword] = useState(null);
@@ -13,7 +16,9 @@ const RegisterScreen = ({ navigation }) => {
     const API_URL = `http://${ip}:5000/api/users`;
     const { login } = useContext(AuthContext);
 
+    // handleRegister - Markii user-ku riixo "Register" button-ka
     const handleRegister = async () => {
+        // Hubi in dhammaan fields-ka la buuxiyay
         if (!name || !email || !password) {
             Alert.alert("Error", "Please fill in all fields");
             return;
@@ -21,6 +26,7 @@ const RegisterScreen = ({ navigation }) => {
 
         setIsLoading(true);
         try {
+            // TALLAABADA 1: Account cusub samee (Create new account)
             console.log("Attempting registration to:", `${API_URL}`);
             const res = await axios.post(
                 `${API_URL}`,
@@ -28,6 +34,8 @@ const RegisterScreen = ({ navigation }) => {
                 { timeout: 10000 }
             );
             console.log("Registration success:", res.data);
+
+            // TALLAABADA 2: Si toos ah u login garee (Auto-login)
             const result = await login(email, password);
             if (!result.success) {
                 Alert.alert("Auto-Login Failed", result.error || "Please try logging in manually.");
@@ -43,7 +51,7 @@ const RegisterScreen = ({ navigation }) => {
 
     return (
         <View className="flex-1 justify-center items-center bg-gray-50 dark:bg-slate-950 p-6">
-            <View className="w-full bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-slate-800">
+            <View className="w-full bg-red dark:bg-slate-900 p-8 rounded-3xl shadow-lg border border-red-100 dark:border-slate-800">
                 <Text className="text-3xl font-extrabold text-center text-gray-800 dark:text-white mb-2">Create Account</Text>
                 <Text className="text-center text-gray-400 dark:text-gray-500 mb-8">Join our restaurant network</Text>
 
@@ -96,4 +104,3 @@ const RegisterScreen = ({ navigation }) => {
 
 export default RegisterScreen;
 
-// Connect registration to backend - 2 days ago

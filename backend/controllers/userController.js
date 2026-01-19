@@ -3,9 +3,7 @@ const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/userModel');
 
-// @desc    Register new user
-// @route   POST /api/users
-// @access  Public
+
 const registerUser = asyncHandler(async (req, res) => {
     let { name, email, password } = req.body;
 
@@ -28,7 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
+    // Create user db
     const user = await User.create({
         name,
         email,
@@ -47,6 +45,7 @@ const registerUser = asyncHandler(async (req, res) => {
             isRestaurantOpen: user.isRestaurantOpen,
             workingHours: user.workingHours,
             language: user.language,
+            //sii token ugaar ah
             token: generateToken(user._id),
         });
     } else {
@@ -55,9 +54,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Authenticate a user
-// @route   POST /api/users/login
-// @access  Public
+
 const loginUser = asyncHandler(async (req, res) => {
     let { email, password } = req.body;
 
@@ -70,7 +67,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // Check for user email
     const user = await User.findOne({ email });
-
+    //passwordka la qoray mala mid yahay kii hash garaysna
     if (user && (await bcrypt.compare(password, user.password))) {
         res.json({
             _id: user.id,
@@ -88,65 +85,6 @@ const loginUser = asyncHandler(async (req, res) => {
     } else {
         res.status(400);
         throw new Error('Invalid credentials');
-    }
-});
-
-// @desc    Google Login
-// @route   POST /api/users/google
-// @access  Public
-const googleLogin = asyncHandler(async (req, res) => {
-    let { email, name, googleId } = req.body;
-    email = email.trim().toLowerCase();
-
-    // Check for user
-    const user = await User.findOne({ email });
-
-    if (user) {
-        // User exists, login
-            res.json({
-                _id: user.id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                location: user.location,
-                restaurantImages: user.restaurantImages,
-                coordinates: user.coordinates,
-                isRestaurantOpen: user.isRestaurantOpen,
-                workingHours: user.workingHours,
-                language: user.language,
-                token: generateToken(user._id),
-            });
-    } else {
-        // User doesn't exist, create new user
-        // Generate random password
-        const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(generatedPassword, salt);
-
-        const newUser = await User.create({
-            name,
-            email,
-            password: hashedPassword,
-        });
-
-        if (newUser) {
-            res.status(201).json({
-                _id: newUser.id,
-                name: newUser.name,
-                email: newUser.email,
-                phone: newUser.phone,
-                location: newUser.location,
-                restaurantImages: newUser.restaurantImages,
-                coordinates: newUser.coordinates,
-                isRestaurantOpen: newUser.isRestaurantOpen,
-                workingHours: newUser.workingHours,
-                language: newUser.language,
-                token: generateToken(newUser._id),
-            });
-        } else {
-            res.status(400);
-            throw new Error('Invalid user data');
-        }
     }
 });
 
@@ -229,7 +167,6 @@ const updateProfile = asyncHandler(async (req, res) => {
 module.exports = {
     registerUser,
     loginUser,
-    googleLogin,
     getMe,
     updateProfile,
 };

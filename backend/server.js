@@ -21,6 +21,7 @@ app.use('/api/external', require('./routes/externalRoutes'));
 app.use('/api/food', require('./routes/foodRoutes'));
 app.use('/api/dine-in', require('./routes/dineInRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/analytics', require('./routes/analyticsRoutes'));
 
 app.get('/', (req, res) => {
     res.send('Restaurant App Backend is Running');

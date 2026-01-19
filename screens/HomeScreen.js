@@ -1,16 +1,20 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { Package, Utensils, Clock, ShoppingBag, ChevronRight } from 'lucide-react-native';
+import { ShoppingBag, ChevronRight, BarChart3, Clock, Banknote } from 'lucide-react-native';
 import { useIsFocused } from '@react-navigation/native';
+import axios from 'axios';
+import ip from '../config/ip';
 
 const HomeScreen = ({ navigation }) => {
     const { t } = useTranslation();
     const { userInfo, userToken } = useContext(AuthContext);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [analyticsLoading, setAnalyticsLoading] = useState(false);
+    const [analytics, setAnalytics] = useState({ visitors: 0, reservations: 0, orders: 0, revenue: 0 });
     const isFocused = useIsFocused();
 
     useEffect(() => {
@@ -18,8 +22,21 @@ const HomeScreen = ({ navigation }) => {
             // Orders feature is paused; keep placeholder
             setOrders([]);
             setLoading(false);
+            fetchAnalytics();
         }
     }, [isFocused]);
+
+    const fetchAnalytics = async () => {
+        try {
+            setAnalyticsLoading(true);
+            const res = await axios.get(`http://${ip}:5000/api/analytics/summary`);
+            setAnalytics({ visitors: res.data.visitors || 0, reservations: res.data.reservations || 0, orders: res.data.orders || 0, revenue: res.data.revenue || 0 });
+        } catch (err) {
+            console.log('Analytics fetch error', err?.response?.data || err.message);
+        } finally {
+            setAnalyticsLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-white dark:bg-slate-950">
@@ -38,7 +55,7 @@ const HomeScreen = ({ navigation }) => {
                 className="px-6"
                 contentContainerStyle={{ paddingBottom: 150 }}
                 refreshControl={
-                    <RefreshControl refreshing={loading} onRefresh={() => {}} />
+                    <RefreshControl refreshing={analyticsLoading} onRefresh={fetchAnalytics} />
                 }
             >
 
@@ -81,27 +98,36 @@ const HomeScreen = ({ navigation }) => {
                 )}
 
                 <View className="mt-4 mb-4">
-                    <Text className="text-xl font-bold text-gray-800 dark:text-white mb-4">{t('quick_actions')}</Text>
-                    <View className="flex-row justify-between">
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Products')}
-                            className="bg-slate-50 dark:bg-slate-900 p-6 rounded-3xl w-[48%] items-center border border-slate-100 dark:border-slate-800"
-                        >
-                            <Package size={24} color="#f97316" />
-                            <Text className="mt-2 text-slate-700 dark:text-white font-bold">{t('products')}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Dine In')}
-                            className="bg-slate-50 dark:bg-slate-900 p-6 rounded-3xl w-[48%] items-center border border-slate-100 dark:border-slate-800"
-                        >
-                            <Utensils size={24} color="#f97316" />
-                            <Text className="mt-2 text-slate-700 dark:text-white font-bold">{t('dine_in')}</Text>
-                        </TouchableOpacity>
+                    <View className="flex-row items-center mb-3">
+                        <BarChart3 size={20} color="#f97316" />
+                        <Text className="text-xl font-bold text-gray-800 dark:text-white ml-2">Analytics</Text>
                     </View>
+
+                    {analyticsLoading ? (
+                        <View className="items-center justify-center py-8">
+                            <ActivityIndicator size="small" color="#f97316" />
+                        </View>
+                    ) : (
+                        <View className="flex-row flex-wrap justify-between">
+                            <AnalyticsCard label="Visitors" value={analytics.visitors} icon={<BarChart3 size={18} color="#f97316" />} />
+                            <AnalyticsCard label="Reservations" value={analytics.reservations} icon={<Clock size={18} color="#f97316" />} />
+                            <AnalyticsCard label="Orders" value={analytics.orders} icon={<ShoppingBag size={18} color="#f97316" />} />
+                            <AnalyticsCard label="Revenue" value={`$${Number(analytics.revenue || 0).toFixed(2)}`} icon={<Banknote size={18} color="#f97316" />} />
+                        </View>
+                    )}
                 </View>
             </ScrollView>
         </SafeAreaView>
     );
 };
+const AnalyticsCard = ({ label, value, icon }) => (
+    <View className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl w-[48%] mb-3 border border-slate-100 dark:border-slate-800 shadow-sm">
+        <View className="flex-row items-center mb-2">
+            {icon ? <View className="mr-2">{icon}</View> : null}
+            <Text className="text-slate-500 dark:text-slate-400 text-xs">{label}</Text>
+        </View>
+        <Text className="text-2xl font-bold text-slate-800 dark:text-white">{value}</Text>
+    </View>
+);
 
 export default HomeScreen;
